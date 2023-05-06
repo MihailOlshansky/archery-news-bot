@@ -1,0 +1,13 @@
+# Это шаблон файла .env
+# Перед тем, как запускать бота, добавьте файл .env в корневую папку бота
+# и добавьте данные переменные в него
+
+# токен вашего телеграм-бота
+TG_TOKEN = BOT_TOKEN
+
+# порт вашей бд
+DB_PORT = YOUR_MYSQL_PORT
+DB_HOST = YOUR_MYSQL_HOST
+DB_USER = YOUR_MYSQL_USER
+DB_PASSWORD = YOUR_MYSQL_PASSWORD
+DB_NAME = YOUR_MYSQL_DB_NAME
