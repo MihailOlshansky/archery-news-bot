@@ -1,13 +1,16 @@
 from database.database_commands.common import execute_request
-from database.tables.admin.fields import USER_ID, USER_NAME
-from database.tables.admin.names import ARCHERY_ADMIN_TABLE
-from database.tables.file.fields import ID, COMPETITION, COMPETITION_YEAR, FILE_ID, FILE_FORMAT, FILE_TYPE
-from database.tables.file.names import ARCHERY_FILE_TABLE
+from database.tables.admin import *
+from database.tables.file import *
+from database.tables.storage import *
 
 
-def init_database():
+def init_database(mode: str = 'in_memory'):
     init_file_table()
     init_admin_table()
+
+    if mode == 'database':
+        init_state_storage_table()
+        init_data_storage_table()
 
 
 def init_file_table():
@@ -20,7 +23,7 @@ def init_file_table():
         f'{FILE_FORMAT} varchar(7), ' \
         f'{FILE_TYPE} varchar(31), ' \
         f'PRIMARY KEY ({ID}));'
-    execute_request(cine_file_table_query, 'Initialization exception')
+    execute_request(cine_file_table_query, 'Initializing file table exception')
 
 
 def init_admin_table():
@@ -29,4 +32,22 @@ def init_admin_table():
         f'({USER_ID} varchar(255), ' \
         f'{USER_NAME} varchar(255), ' \
         f'PRIMARY KEY ({USER_ID}));'
-    execute_request(cine_admin_table_query, 'Initialization exception')
+    execute_request(cine_admin_table_query, 'Initializing admin table exception')
+
+
+def init_state_storage_table():
+    cine_state_storage_table_query = \
+        f'CREATE TABLE IF NOT EXISTS {ARCHERY_STATE_STORAGE}' \
+        f'({KEY} varchar(255), ' \
+        f'{STATE} varchar(255), ' \
+        f'PRIMARY KEY ({KEY}));'
+    execute_request(cine_state_storage_table_query, 'Initializing state storage table exception')
+
+
+def init_data_storage_table():
+    cine_data_storage_table_query = \
+        f'CREATE TABLE IF NOT EXISTS {ARCHERY_DATA_STORAGE}' \
+        f'({KEY} varchar(255), ' \
+        f'{DATA} text, ' \
+        f'PRIMARY KEY ({KEY}));'
+    execute_request(cine_data_storage_table_query, 'Initializing data storage table exception')

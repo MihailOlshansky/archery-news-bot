@@ -7,19 +7,22 @@ import re
 from aiogram import types
 from aiogram_dialog import DialogManager
 
-from bot.common import send_wrong_file_info_format
+from bot.common import send_wrong_file_info_format, get_file_type_by_state
+from bot.stategroups import MainSG
 from database import is_admin
 from database.tables import FILE_TYPE
 from database.tables.file import COMPETITION, COMPETITION_YEAR, FILE_ID, FILE_FORMAT
 from database.database_commands import insert_file_data
 
 
-async def add_file_command(message: types.Message):
+async def add_file_command(message: types.Message, dialog_manager: DialogManager):
     if not is_admin(message.from_user.username):
         return
 
+    file_type = get_file_type_by_state(dialog_manager.current_context().state)
     file_id: str = message.document.file_id
     file_format = message.document.file_name.split('.')[-1]
+
     try:
         parameters = re.sub(r"^/add_protocol\s*", '', message.html_text)
         parameters = re.sub(r"\s+", ' ', parameters).split()
@@ -37,7 +40,7 @@ async def add_file_command(message: types.Message):
         COMPETITION_YEAR: int(parameters[1]),
         FILE_ID: file_id,
         FILE_FORMAT: file_format,
-        FILE_TYPE: 'Протокол'
+        FILE_TYPE: file_type
     }
     insert_file_data(data)
     await message.answer('Done')

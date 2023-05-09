@@ -11,7 +11,7 @@ from database.database_commands import get_files_by_parameters
 from database.tables import COMPETITION, COMPETITION_YEAR, FILE_FORMAT, FILE_ID, FILE_TYPE
 
 
-async def get_files_command(message: types.Message):
+async def get_files_command(message: types.Message, dialog_manager: DialogManager):
     params: dict[str, str] = await get_parameters_for_get_files(message)
     if params is None:
         return
