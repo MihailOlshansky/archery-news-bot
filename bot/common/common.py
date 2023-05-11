@@ -2,25 +2,54 @@ from typing import Dict
 
 from aiogram import types, Bot
 from aiogram.dispatcher.filters.state import State
-from aiogram.types import Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.when import Whenable
 
-from bot.stategroups import MainSG
+from bot.stategroups import AddProtocolSG, AddRuleSG, GetProtocolsSG, GetRulesSG, MainSG
+from bot.stategroups.common import StatesConstants
 from config import TG_TOKEN
 from database import is_admin
 
 bot = Bot(token=TG_TOKEN)
+user_req_data = dict()
 
 
-def get_file_type_by_state(state: State):
-    group = state.group
-    if MainSG.PROTOCOL in group:
+def get_file_type_by_state(state: State) -> str:
+    state_name = state.state
+    if StatesConstants.PROTOCOL in state_name:
         return 'Протокол'
-    elif MainSG.RULE in group:
+    elif StatesConstants.RULE in state_name:
         return 'Положение'
     else:
         return 'Неизвестный_Тип'
+
+
+def get_year_state(state: State) -> State:
+    state_name = state.state
+    if StatesConstants.ADD in state_name:
+        if StatesConstants.PROTOCOL in state_name:
+            return AddProtocolSG.year
+        elif StatesConstants.RULE in state_name:
+            return AddRuleSG.year
+    elif StatesConstants.GET in state_name:
+        if StatesConstants.PROTOCOL in state_name:
+            return GetProtocolsSG.year
+        elif StatesConstants.RULE in state_name:
+            return GetRulesSG.year
+
+
+def get_competition_state(state: State) -> State:
+    state_name = state.state
+    if StatesConstants.ADD in state_name:
+        if StatesConstants.PROTOCOL in state_name:
+            return AddProtocolSG.competition
+        elif StatesConstants.RULE in state_name:
+            return AddRuleSG.competition
+    elif StatesConstants.GET in state_name:
+        if StatesConstants.PROTOCOL in state_name:
+            return GetProtocolsSG.competition
+        elif StatesConstants.RULE in state_name:
+            return GetRulesSG.competition
 
 
 async def send_wrong_file_info_format(message: types.Message):
@@ -42,6 +71,6 @@ async def send_wrong_file_request_format(message: types.Message):
     ]))
 
 
-def is_admin_command(data: Dict, widget: Whenable, dialog_manager: DialogManager):
+def is_admin_command(data: Dict, widget: Whenable, dialog_manager: DialogManager) -> bool:
     user_id = data['event'].from_user.id
     return is_admin(user_id)

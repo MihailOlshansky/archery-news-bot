@@ -18,5 +18,5 @@ main_window = Window(
         AddRuleButton.button,
         when=is_admin_command
     ),
-    state=MainSG.main_start
+    state=MainSG.start
 )

@@ -6,5 +6,7 @@ from bot.stategroups import MainSG
 
 
 async def stop_clicked(c: CallbackQuery, button: Button, manager: DialogManager):
-    await manager.dialog().switch_to(MainSG.main_start)
+    await manager.mark_closed()
+    await manager.reset_stack()
+    await manager.start(MainSG.start)
 

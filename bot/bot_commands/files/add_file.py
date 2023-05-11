@@ -2,45 +2,31 @@
 Данная функция отвечает за обработку команды /add_protocol
 Она позволяет сохранить протокол в бд
 """
-import re
-
 from aiogram import types
 from aiogram_dialog import DialogManager
 
-from bot.common import send_wrong_file_info_format, get_file_type_by_state
-from bot.stategroups import MainSG
+from bot.bot_commands.common import get_from_dm
+from bot.common import get_file_type_by_state, user_req_data
 from database import is_admin
 from database.tables import FILE_TYPE
 from database.tables.file import COMPETITION, COMPETITION_YEAR, FILE_ID, FILE_FORMAT
 from database.database_commands import insert_file_data
 
 
-async def add_file_command(message: types.Message, dialog_manager: DialogManager):
+async def add_file_command(message: types.Message, manager: DialogManager):
     if not is_admin(message.from_user.username):
         return
 
-    file_type = get_file_type_by_state(dialog_manager.current_context().state)
-    file_id: str = message.document.file_id
-    file_format = message.document.file_name.split('.')[-1]
+    (user, chat) = get_from_dm(manager)
+    file_data = user_req_data[chat][user]
 
-    try:
-        parameters = re.sub(r"^/add_protocol\s*", '', message.html_text)
-        parameters = re.sub(r"\s+", ' ', parameters).split()
-    except Exception as e:
-        print(e)
-        await send_wrong_file_info_format(message)
-        return
-
-    if len(parameters) != 2:
-        await send_wrong_file_info_format(message)
-        return
-
-    data = {
-        COMPETITION: parameters[0],
-        COMPETITION_YEAR: int(parameters[1]),
-        FILE_ID: file_id,
-        FILE_FORMAT: file_format,
-        FILE_TYPE: file_type
+    params = {
+        FILE_ID: file_data[FILE_ID],
+        FILE_FORMAT: file_data[FILE_FORMAT],
+        FILE_TYPE: file_data[FILE_TYPE],
+        COMPETITION: file_data[COMPETITION],
+        COMPETITION_YEAR: file_data[COMPETITION_YEAR]
     }
-    insert_file_data(data)
-    await message.answer('Done')
+
+    insert_file_data(params)
+    await message.answer(f'{file_data[FILE_TYPE]} добавлен')

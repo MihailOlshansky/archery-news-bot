@@ -7,10 +7,10 @@ def get_files_by_parameters(params: dict[str, str]):
     get_protocols_sql =\
         f"SELECT {FILE_ID}, {COMPETITION}, {COMPETITION_YEAR}, {FILE_FORMAT}, {FILE_TYPE} " \
         f"FROM {ARCHERY_FILE_TABLE} " \
-        f"WHERE LOWER({COMPETITION}) LIKE '%{params['Соревнование'].lower()}%' "
+        f"WHERE LOWER({COMPETITION}) LIKE '%{params[COMPETITION].lower()}%' "
 
     conditions = list()
-    for dates in params['Год'].split(', '):
+    for dates in params[COMPETITION_YEAR].split(', '):
         dates_range = dates.split('-')
         date_start = dates_range[0]
         date_end = int(dates_range[-1]) + 1
